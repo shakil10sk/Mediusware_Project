@@ -16,7 +16,7 @@
 
 
     <div class="card">
-        <form action="" method="get" class="card-header">
+        <form action="{{ url('/product') }}" method="get" class="card-header">
             <div class="form-row justify-content-between">
                 <div class="col-md-2">
                     <input type="text" name="title" placeholder="Product Title" class="form-control">

@@ -18,10 +18,10 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
 
-        $productData = Product::with('ProductVariantPrice','ProductVariant','ProductImage')->get()->toArray();
+        $productData = Product::with('ProductVariantPrice','ProductImage')->get()->toArray();
 
         foreach($productData as $key=>$val){
             foreach($val['product_variant_price'] as $in=>$vl){
@@ -82,9 +82,9 @@ class ProductController extends Controller
             $productVariantSave = false;
             foreach($request->product_variant as $key=>$value){
                 foreach($value['tags'] as $index=>$item){
-                    $productVariantData[$index]['variant_id'] = $value['option'];
+                    $productVariantData[$index]['variant_id'] = $value['option'] ?? null;
                     $productVariantData[$index]['variant'] = $item ?? null;
-                    $productVariantData[$index]['product_id'] = $productSaved->id;
+                    $productVariantData[$index]['product_id'] = $productSaved->id ?? null?? null;
                     $productVariantData[$index]['created_at'] = Carbon::now();
                     $productVariantData[$index]['updated_at'] = Carbon::now();
                 }
@@ -100,20 +100,21 @@ class ProductController extends Controller
 
                 foreach($request->product_variant_prices as $index=>$data){
                     $title = explode('/', $data['title']);
+                    array_pop($title);
 
                     foreach($newProductVariantData as $key=>$val){
-                        if($title[0] == $val['variant']){
-                            $variantPriceTable[$index]['product_variant_one'] = $val['id'];
+                        if(isset($title[0]) && $title[0] == $val['variant']){
+                            $variantPriceTable[$index]['product_variant_one'] = $val['id']?? null;
                         }
-                        if($title[1] == $val['variant']){
-                            $variantPriceTable[$index]['product_variant_two'] = $val['id'];
+                        if(isset($title[1]) && $title[1] == $val['variant']){
+                            $variantPriceTable[$index]['product_variant_two'] = $val['id']?? null;
                         }
-                        if($title[2] == $val['variant']){
-                            $variantPriceTable[$index]['product_variant_three'] = $val['id'];
+                        if(isset($title[2]) && $title[2] == $val['variant']){
+                            $variantPriceTable[$index]['product_variant_three'] = $val['id']?? null;
                         }
                     }
-                    $variantPriceTable[$index]['price'] = $data['price'];
-                    $variantPriceTable[$index]['stock'] = $data['stock'];
+                    $variantPriceTable[$index]['price'] = $data['price'] ?? null;
+                    $variantPriceTable[$index]['stock'] = $data['stock'] ?? null;
                     $variantPriceTable[$index]['product_id'] = $productSaved->id;
                     $variantPriceTable[$index]['created_at'] = Carbon::now();
 

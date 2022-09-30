@@ -191,6 +191,9 @@ export default {
 
             axios.post('/product', product).then(response => {
                 console.log(response.data);
+                alert(response.msg);
+
+                location.reload();
             }).catch(error => {
                 console.log(error);
             })
@@ -202,6 +205,11 @@ export default {
     },
     mounted() {
         console.log('Component mounted.')
+    },
+    computed(){
+        resetFunction(){
+
+        }
     }
 }
 </script>
