@@ -21,7 +21,27 @@ class ProductController extends Controller
     public function index(Request $request)
     {
 
-        $productData = Product::with('ProductVariantPrice','ProductImage')->get()->toArray();
+        $productData = Product::with([
+                            'ProductVariantPrice'=>function($q) use($request){
+                                $q->when($request->price_from,function($qu)use($request){
+                                    $qu->where('price','>=', $request->price_from ?? 0)
+                                    ->orWhere('price','<=',$request->price_to ?? 0);
+                                });
+                            },
+                            'ProductVariant'=>function($q) use($request){
+                                $q->when($request->variant,function($qu)use($request){
+                                    $qu->Where('variant', 'like', '%' . $request->variant . '%');
+                                });
+                            },
+                            'ProductImage'
+                        ])
+                        ->when($request->title,function($q)use($request){
+                            $q->Where('title', 'like', '%' . $request->title . '%');
+                        })
+                        ->when($request->date,function($q)use($request){
+                            $q->Where('created_at', '>=', $request->date);
+                        })
+                        ->get()->toArray();
 
         foreach($productData as $key=>$val){
             foreach($val['product_variant_price'] as $in=>$vl){
@@ -40,7 +60,9 @@ class ProductController extends Controller
             }
         }
 
-        return view('products.index',compact('productData'));
+        $variant = ProductVariant::with('Variant')->select('id','variant')->distinct()->get();
+
+        return view('products.index',compact('productData','variant'));
     }
 
     /**
@@ -157,10 +179,19 @@ class ProductController extends Controller
      * @param \App\Models\Product $product
      * @return \Illuminate\Http\Response
      */
-    public function edit(Product $product)
+    public function edit(Request $request,$id)
     {
+
+        $productData = Product::with([
+            'ProductVariantPrice',
+            'ProductVariant',
+            'ProductImage'
+        ])
+        ->where('id',$id)
+        ->first();
+
         $variants = Variant::all();
-        return view('products.edit', compact('variants'));
+        return view('products.edit', compact('variants','productData'));
     }
 
     /**

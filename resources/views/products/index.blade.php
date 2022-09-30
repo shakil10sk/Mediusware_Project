@@ -23,7 +23,10 @@
                 </div>
                 <div class="col-md-2">
                     <select name="variant" id="" class="form-control">
-
+                        <option >--Select Variants--</option>
+                        @foreach ($variant as $item)
+                            <option value="{{ $item->variant }}" >{{ $item->variant }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -88,7 +91,7 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
-                                    <a href="{{ route('product.edit', 1) }}" class="btn btn-success">Edit</a>
+                                    <a href="{{ route('product.edit', $productValue['id']) }}" class="btn btn-success">Edit</a>
                                 </div>
                             </td>
                         </tr>

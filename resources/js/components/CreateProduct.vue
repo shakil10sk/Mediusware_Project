@@ -186,13 +186,11 @@ export default {
                 product_image: this.images,
                 product_variant: this.product_variant,
                 product_variant_prices: this.product_variant_prices
-            }
+            };
 
 
             axios.post('/product', product).then(response => {
-                console.log(response.data);
-                alert(response.msg);
-
+                alert(response.data.msg);
                 location.reload();
             }).catch(error => {
                 console.log(error);
@@ -205,11 +203,6 @@ export default {
     },
     mounted() {
         console.log('Component mounted.')
-    },
-    computed(){
-        resetFunction(){
-
-        }
     }
 }
 </script>
