@@ -20,4 +20,8 @@ class ProductVariantPrice extends Model
     public function Product(){
         return $this->belongsTo(Product::class,'product_id','id');
     }
+
+    public function ProductVariant(){
+        return $this->hasOne(ProductVariant::class,);
+    }
 }

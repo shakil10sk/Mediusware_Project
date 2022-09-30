@@ -21,12 +21,26 @@ class ProductController extends Controller
     public function index()
     {
 
-        dd(ProductVariant::with('Variant')->where('id',1)->first());
+        $productData = Product::with('ProductVariantPrice','ProductVariant','ProductImage')->get()->toArray();
 
-        dd(Product::with('ProductVariantPrice','ProductVariant','ProductImage')->first());
-        dd(ProductVariantPrice::with('Product')->first()->product);
+        foreach($productData as $key=>$val){
+            foreach($val['product_variant_price'] as $in=>$vl){
+                if(!empty($vl['product_variant_one'])){
+                    $productData[$key]['product_variant_price'][$in]['product_variant_one'] =
+                    ProductVariant::select('variant')->where('id',$vl['product_variant_one'])->first()->variant;
+                }
+                if(!empty($vl['product_variant_two'])){
+                    $productData[$key]['product_variant_price'][$in]['product_variant_two'] =
+                    ProductVariant::select('variant')->where('id',$vl['product_variant_two'])->first()->variant;
+                }
+                if(!empty($vl['product_variant_three'])){
+                    $productData[$key]['product_variant_price'][$in]['product_variant_three'] =
+                    ProductVariant::select('variant')->where('id',$vl['product_variant_three'])->first()->variant;
+                }
+            }
+        }
 
-        return view('products.index');
+        return view('products.index',compact('productData'));
     }
 
     /**
