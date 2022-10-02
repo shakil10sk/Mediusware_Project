@@ -18,7 +18,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary">Media</h6>
@@ -110,6 +109,9 @@ export default {
         variants: {
             type: Array,
             required: true
+        },
+        productValues: {
+            type: Object
         }
     },
     data() {
@@ -202,7 +204,26 @@ export default {
 
     },
     mounted() {
-        console.log('Component mounted.')
-    }
+            this.product_name = this.productValues.title;
+            this.product_sku = this.productValues.sku;
+            this.description = this.productValues.description;
+            this.images = this.productValues.product_image;
+            // this.product_variant = this.productValues.product_variant;
+            this.product_variant_prices = this.productValues.product_variant_price;
+
+            // product_variant: [
+            //     {
+            //         option: this.variants[0].id,
+            //         tags: []
+            //     }
+            // ],
+
+        console.log(this.productValues);
+        // console.log(this.product_name)
+        // console.log(this.description)
+        // console.log(this.images)
+        // console.log(this.product_variant)
+        // console.log(this.product_variant_prices)
+        }
 }
 </script>

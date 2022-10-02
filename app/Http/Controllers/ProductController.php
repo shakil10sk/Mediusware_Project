@@ -188,9 +188,10 @@ class ProductController extends Controller
             'ProductImage'
         ])
         ->where('id',$id)
-        ->first();
+        ->first()->toArray();
 
         $variants = Variant::all();
+        // dd($variants,json_encode($productData));
         return view('products.edit', compact('variants','productData'));
     }
 
