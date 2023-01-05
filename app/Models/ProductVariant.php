@@ -17,7 +17,7 @@ class ProductVariant extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function Variant()
+    public function VariantModel()
     {
         return $this->hasOne(Variant::class, 'id');
     }

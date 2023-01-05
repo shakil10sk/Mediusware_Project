@@ -60,7 +60,8 @@ class ProductController extends Controller
             }
         }
 
-        $variant = ProductVariant::with('Variant')->select('id','variant')->distinct()->get();
+        $variant = ProductVariant::with('VariantModel')->select('id','variant','variant_id')->get()->take(50);
+
 
         return view('products.index',compact('productData','variant'));
     }
@@ -182,17 +183,29 @@ class ProductController extends Controller
     public function edit(Request $request,$id)
     {
 
-        $productData = Product::with([
-            'ProductVariantPrice',
-            'ProductVariant',
-            'ProductImage'
-        ])
-        ->where('id',$id)
-        ->first()->toArray();
+        $product_info = Product::find($id)->first();
+
+        $productVariant = DB::table('product_variant_prices as VP')
+                ->leftJoin('product_variants as variant_one','variant_one.id','=','VP.product_variant_one')
+                ->leftJoin('product_variants as variant_two','variant_two.id','=','VP.product_variant_two')
+                ->leftJoin('product_variants as variant_there','variant_there.id','=','VP.product_variant_three')
+                ->where('VP.product_id',$id)
+                ->select('VP.*','variant_one.variant as product_variant_one','variant_two.variant as product_variant_two','variant_there.variant as product_variant_three')
+                ->get();
+
+        $variants_list = DB::table('variants')->leftJoin('product_variants','variants.id','=','product_variants.variant_id')->where('product_variants.product_id',$id)
+            ->select('variants.id as vaiantID','product_variants.*')->get();
+
+        $existVariant = [];
+        foreach ($variants_list as $key=>$val){
+            $existVariant[$val->vaiantID][] = [
+                "variant"=>$val->variant
+            ];
+        }
 
         $variants = Variant::all();
-        // dd($variants,json_encode($productData));
-        return view('products.edit', compact('variants','productData'));
+
+        return view('products.edit', compact('product_info','productVariant','variants','existVariant'));
     }
 
     /**
@@ -204,7 +217,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+        dd($request->all());
     }
 
     /**

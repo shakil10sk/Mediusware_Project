@@ -24,7 +24,7 @@
                 <div class="col-md-2">
                     <select name="variant" id="" class="form-control">
                         <option >--Select Variants--</option>
-                        @foreach ($variant as $item)
+                        @foreach ($variant as $key=>$item)
                             <option value="{{ $item->variant }}" >{{ $item->variant }}</option>
                         @endforeach
                     </select>

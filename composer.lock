@@ -942,7 +942,7 @@
                 "illuminate/queue": "self.version",
                 "illuminate/redis": "self.version",
                 "illuminate/routing": "self.version",
-                "illuminate/session": "self.version",
+                "minate/session": "self.version",
                 "illuminate/support": "self.version",
                 "illuminate/testing": "self.version",
                 "illuminate/translation": "self.version",
