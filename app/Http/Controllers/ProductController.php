@@ -208,7 +208,6 @@ class ProductController extends Controller
             ];
         }
         $variants = Variant::all();
-        dd($productVariant,$existVariant,$variants);
 
         return view('products.edit', compact('product_info','productVariant','variants','existVariant'));
     }
