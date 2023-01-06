@@ -34,7 +34,6 @@
                         <h6 class="m-0 font-weight-bold text-primary">Variants</h6>
                     </div>
                     <div class="card-body">
-                        {{product_variant }}
                         <div class="row" v-for="(item,index) in product_variant">
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -42,8 +41,7 @@
                                     <select v-model="item.option" class="form-control">
                                         <option v-for="variant in variants"
                                                 :value="variant.id"
-                                                v-bind:selected="variant.id==index ? true : false">
-
+                                        >
                                             {{ variant.title }}
                                         </option>
                                     </select>
@@ -129,6 +127,7 @@ export default {
     },
     data() {
         return {
+            product_id: this.productInfo.id,
             product_name: this.productInfo.title,
             product_sku: this.productInfo.sku,
             description: this.productInfo.description,
@@ -196,6 +195,7 @@ export default {
         // store product into database
         saveProduct() {
             let product = {
+                id:this.product_id,
                 title: this.product_name,
                 sku: this.product_sku,
                 description: this.description,
@@ -205,7 +205,7 @@ export default {
             };
 
 
-            axios.post('/product', product).then(response => {
+            axios.put('/product/'+product.id, product).then(response => {
                 alert(response.data.msg);
                 location.reload();
             }).catch(error => {
@@ -224,6 +224,9 @@ export default {
             this.images = this.productValues.product_image;
             // this.product_variant = this.productValues.product_variant;
             this.product_variant_prices = this.productValues.product_variant_price;
+
+            // this.product_variant = this.existVariant
+        console.log(this.existVariant);
 
             // product_variant: [
             //     {

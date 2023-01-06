@@ -67,6 +67,7 @@
                             <table class="table">
                                 <thead>
                                 <tr>
+                                <tr>
                                     <td>Variant</td>
                                     <td>Price</td>
                                     <td>Stock</td>

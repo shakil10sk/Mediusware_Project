@@ -91,7 +91,7 @@ class ProductController extends Controller
 
         $productData = [
             'title'=>$request->title,
-            'sku'=>$request->description,
+            'sku'=>$request->sku,
             'description'=>$request->description,
             'created_at'=> Carbon::now(),
             'created_at'=> Carbon::now()
@@ -197,13 +197,18 @@ class ProductController extends Controller
             ->select('variants.id as vaiantID','product_variants.*')->get();
 
         $existVariant = [];
+        $tags = [];
         foreach ($variants_list as $key=>$val){
-            $existVariant[$val->vaiantID][] = [
-                "variant"=>$val->variant
+            $tags[$val->vaiantID][]=$val->variant;
+        }
+        foreach ($variants_list as $key=>$val){
+            $existVariant[$val->vaiantID] = [
+                "option"=>$val->vaiantID,
+                "tags"=>$tags[$val->vaiantID],
             ];
         }
-
         $variants = Variant::all();
+        dd($productVariant,$existVariant,$variants);
 
         return view('products.edit', compact('product_info','productVariant','variants','existVariant'));
     }
@@ -217,7 +222,86 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        dd($request->all());
+        DB::beginTransaction();
+        try{
+
+            $product->title = $request->title;
+            $product->sku = $request->sku;
+            $product->description = $request->description;
+            $product->updated_at = Carbon::now();
+//            $productData = [
+//                'title'=>$request->title,
+//                'sku'=>$request->sku,
+//                'description'=>$request->description,
+//                'created_at'=> Carbon::now(),
+//                'created_at'=> Carbon::now()
+//            ];
+
+//            $productSaved = Product::create($productData);
+
+            if($product->save()){
+
+                $productVariantData = [];
+                $productVariantSave = false;
+                ProductVariant::where('product_id',$product->id)->delete();
+                foreach($request->product_variant as $key=>$value){
+                    foreach($value['tags'] as $index=>$item){
+                        $productVariantData[$index]['variant_id'] = $value['option'] ?? null;
+                        $productVariantData[$index]['variant'] = $item ?? null;
+                        $productVariantData[$index]['product_id'] = $product->id ?? null?? null;
+                        $productVariantData[$index]['created_at'] = Carbon::now();
+                        $productVariantData[$index]['updated_at'] = Carbon::now();
+                    }
+                    $productVariantSave = DB::table('product_variants')->insert($productVariantData);
+                }
+
+
+                if($productVariantSave){
+                    $savedProductVariantData = ProductVariant::select('id','variant')->where('product_id',$product->id)->get();
+                    $newProductVariantData = $savedProductVariantData->toArray();
+                    $variantPriceTable = [];
+                    ProductVariantPrice::where('product_id',$product->id)->delete();
+                    foreach($request->product_variant_prices as $index=>$data){
+//                        dd($data["product_variant_one"]);
+//                        $title = explode('/', $data['title']);
+//                        array_pop($title);
+
+                        foreach($newProductVariantData as $key=>$val){
+                            if(isset($data["product_variant_one"]) && $data["product_variant_one"] == $val['variant']){
+                                $variantPriceTable[$index]['product_variant_one'] = $val['id']?? null;
+                            }
+                            if(isset($data["product_variant_two"]) && $data["product_variant_two"] == $val['variant']){
+                                $variantPriceTable[$index]['product_variant_two'] = $val['id']?? null;
+                            }
+                            if(isset($data["product_variant_three"]) && $data["product_variant_three"] == $val['variant']){
+                                $variantPriceTable[$index]['product_variant_three'] = $val['id']?? null;
+                            }
+                        }
+                        $variantPriceTable[$index]['price'] = $data['price'] ?? null;
+                        $variantPriceTable[$index]['stock'] = $data['stock'] ?? null;
+                        $variantPriceTable[$index]['product_id'] = $product->id;
+                        $variantPriceTable[$index]['created_at'] = Carbon::now();
+
+                    }
+                    $productVariantPrice = DB::table('product_variant_prices')->insert($variantPriceTable);
+                }
+            }
+
+            DB::commit();
+
+            if($productVariantPrice){
+                return response()->json(['status'=>'success','msg'=>'Product Inserted Successfull']);
+            }
+
+
+        }catch(Exception $e){
+            DB::rollback();
+            dd($e);
+
+            return response()->json(['status'=>'error','msg'=>'Product Not Inserted Successfully'.$e->getMessage()]);
+        }
+
+
     }
 
     /**
